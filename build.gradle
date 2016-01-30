@@ -1,0 +1,310 @@
+import org.gradle.internal.os.OperatingSystem
+
+buildscript {
+    repositories {
+        maven {
+            url 'http://maven.ej-technologies.com/repository'
+        }
+    }
+    dependencies {
+        classpath group: 'com.install4j', name: 'gradle-plugin', version: '6.0'
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
+    id "com.github.kt3k.coveralls" version "2.4.0x"
+    id "com.github.youribonnaffe.gradle.format" version "1.2"
+    id "com.coverity.ondemand" version "1.5.61"
+}
+
+apply plugin: "java"
+apply plugin: "application"
+apply plugin: "project-report"
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'install4j'
+
+apply from: 'eclipse.gradle'
+
+// HACK to disable coverityCheck task when not on CI server
+// necessary as coverity automatically adds check.dependsOn coverityCheck
+gradle.taskGraph.whenReady { taskGraph ->
+    def tasks = taskGraph.getAllTasks()
+    if (System.env.CI == null) {
+        tasks.findAll {it.name.startsWith('coverityCheck')}.each { task ->
+                task.enabled = false
+        }
+    }
+}
+
+group = "net.sf.jabref"
+version = "3.3dev"
+project.ext.threeDotVersion = "3.2.0.1"
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+mainClassName = "net.sf.jabref.JabRefMain"
+
+install4j {
+    installDir = file(project.ext.install4jDir)
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.10'
+}
+
+
+repositories {
+    jcenter()
+}
+
+configurations {
+    antlr3
+    antlr4
+}
+
+dependencies {
+
+	compile 'javax.mail:mail:1.4.7'
+
+    compile 'com.jgoodies:jgoodies-common:1.8.1'
+    compile 'com.jgoodies:jgoodies-forms:1.9.0'
+    compile 'com.jgoodies:jgoodies-looks:2.7.0'
+
+    compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
+
+    compile 'org.apache.pdfbox:pdfbox:1.8.11'
+    compile 'org.apache.pdfbox:fontbox:1.8.11'
+    compile 'org.apache.pdfbox:jempbox:1.8.11'
+
+    compile 'commons-cli:commons-cli:1.3.1'
+
+    compile 'org.openoffice:juh:4.1.2'
+    compile 'org.openoffice:jurt:4.1.2'
+    compile 'org.openoffice:ridl:4.1.2'
+    compile 'org.openoffice:unoil:4.1.2'
+
+    antlr3 'org.antlr:antlr:3.5.2'
+    compile 'org.antlr:antlr-runtime:3.5.2'
+
+    antlr4 'org.antlr:antlr4:4.5.1-1'
+    compile 'org.antlr:antlr4-runtime:4.5.1-1'
+
+    compile 'mysql:mysql-connector-java:5.1.38'
+    compile 'org.postgresql:postgresql:9.4.1207'
+
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
+    compile fileTree(dir: 'lib', includes: ['*.jar'])
+
+    compile 'com.google.guava:guava:19.0'
+
+    compile 'commons-logging:commons-logging:1.2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.mashape.unirest:unirest-java:1.4.7'
+
+    compile 'org.apache.logging.log4j:log4j-jcl:2.5'
+    compile 'org.apache.logging.log4j:log4j-api:2.5'
+    compile 'org.apache.logging.log4j:log4j-core:2.5'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", "src/main/gen"]
+        }
+    }
+}
+
+processResources {
+    filesMatching("build.properties") {
+        expand (version: project.version,
+                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
+                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
+                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "))
+    }
+
+    filesMatching("resource/**/meta.xml") {
+        expand version: project.version
+    }
+}
+
+clean {
+    delete "src/main/gen"
+}
+
+task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
+    group = 'JabRef'
+    description 'Generates all Java source files.'
+}
+
+task generateBstGrammarSource(type: JavaExec) {
+    group 'JabRef'
+    description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
+
+    File antlrSource = file('src/main/antlr3/net/sf/jabref/bst/Bst.g')
+
+    inputs.file antlrSource
+    outputs.file file('src/main/gen/net/sf/jabref/bst/BstLexer.java')
+    outputs.file file('src/main/gen/net/sf/jabref/bst/BstParser.java')
+
+    main = 'org.antlr.Tool'
+    classpath = configurations.antlr3
+    args = ["-o", file('src/main/gen/net/sf/jabref/bst/'), antlrSource]
+}
+
+task generateSearchGrammarSource(type: JavaExec) {
+    String grammarFile = "Search"
+
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr4."
+
+    String packagePath = "net/sf/jabref/search"
+    File antlrPath = file("src/main/antlr4")
+    File genPath = file("src/main/gen")
+
+    File antlrSource = file("$antlrPath/$packagePath/${grammarFile}.g4")
+    File destinationDir = file("$genPath/$packagePath")
+
+    inputs.file antlrSource
+    outputs.file file("$destinationDir/${grammarFile}Parser.java")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.java")
+    outputs.file file("$destinationDir/${grammarFile}Visitor.java")
+    outputs.file file("$destinationDir/${grammarFile}BaseVisitor.java")
+    outputs.file file("$destinationDir/${grammarFile}.tokens")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.tokens")
+
+    main = 'org.antlr.v4.Tool'
+    classpath = configurations.antlr4
+    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:none"
+}
+compileJava.dependsOn "generateSource"
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        version = true
+        author = true
+    }
+}
+
+test {
+    testLogging {
+        exceptionFormat "full" // default is "short"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+
+// enables `gradlew format`. Currently `LabelPatternUtil.java` is destroyed. Use with care!
+format {
+    configurationFile = file('ide-settings/formatter_settings.xml')
+    // default: reformat main and test
+    //files = sourceSets.main.java
+}
+
+shadowJar {
+    classifier 'fat'
+}
+
+/*
+ * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
+ */
+if (hasProperty('dev')) {
+    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+    String commitInfo = ""
+    if (OperatingSystem.current().isWindows()) {
+        commitInfo = "cmd /c $command".execute().in.text
+    } else {
+        commitInfo = command.execute().in.text
+    }
+
+    // determine branch
+    command = "git symbolic-ref -q --short HEAD"
+    String branchName = ""
+    if (OperatingSystem.current().isWindows()) {
+        branchName = "cmd /c $command".execute().in.text
+    } else {
+        branchName = command.execute().in.text
+    }
+    // A newline is returned. Remove it. (trim())
+    // In the context of github, the branch name could be something like "pull/277"
+    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
+    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
+
+    // hack string
+    // first the date (%cd), then the branch name, and finally the commit id (%h)
+    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+
+    project.version += "--snapshot--" + infoString
+}
+
+// has to be defined AFTER 'dev' things to have the correct project.version
+task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
+    projectFile = file('jabref.install4j')
+    release = project.version
+    variables = [
+        versionFourDots: project.ext.threeDotVersion,
+        buildFileName: jar.archiveName,
+        version: project.version
+    ]
+
+    doLast {
+        copy {
+            from "build/install4j"
+            into "build/releases"
+        }
+    }
+}
+
+task release(dependsOn: ["media", "releaseJar"]) {
+    group = 'JabRef - Release'
+    description 'Creates a release for all target platforms.'
+}
+
+task releaseJar(dependsOn: "shadowJar") {
+    group = 'JabRef - Release'
+    description "Creates a Jar release."
+
+    doLast {
+        copy {
+            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
+            into("$buildDir/releases")
+
+            rename { String fileName ->
+                fileName.replace('-fat', '')
+            }
+        }
+    }
+}
+
+// fetch all dependencies to speedup CircleCI build
+// this is necessary until https://discuss.circleci.com/t/effective-caching-for-gradle/540 is resolved
+// see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
+// better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
+task getdeps(type: Copy) {
+    from (configurations.compile+configurations.antlr3+configurations.antlr4+configurations.testCompile) {
+        include "*.jar"
+    }
+    into 'build/tmp/alldeps/'
+}
+
