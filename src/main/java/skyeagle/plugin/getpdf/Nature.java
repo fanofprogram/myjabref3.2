@@ -13,47 +13,42 @@ import skyeagle.plugin.gui.UpdateDialog;
 
 public class Nature implements GetPdfFile {
 
-	private String url;
+	private final String url;
 
 	public Nature(String url) {
 		this.url = url;
 	}
 
-	public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
+	@Override
+    public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
 
 		String base = "http://www.nature.com";
-		// 获取网址的内容（html)和cookies
 		Map<String, String> cookies = new TreeMap<>();
 		String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
 		if (pagecontent == null) {
-			dig.output("网络不通，请检查代理和网络。");
+            dig.output("The network don't work, please check proxy and network.");
 			return;
 		}
-		// 使用Jsoup库对html内容进行解析
 		Document doc = Jsoup.parse(pagecontent);
-		// 利用Jsoup中的选择器寻找需要的节点, 这里要找的是pdf文件的连接
-		// Scientific Reports是开源的，可以直接下载，和其他nature的杂志不一样
 		String pdflink = null;
 		int flag = pagecontent.indexOf("Scientific Reports");
-		if (flag != -1)
-			pdflink = doc.select("a[data-track-dest=link:Download as PDF]").attr("href");
-		else
-			pdflink = doc.select("a#download-pdf").attr("href");
+		if (flag != -1) {
+            pdflink = doc.select("a[data-track-dest=link:Download as PDF]").attr("href");
+        } else {
+            pdflink = doc.select("a#download-pdf").attr("href");
+        }
 		if (pdflink.isEmpty()) {
-			dig.output("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
-			// System.out.println("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
+            dig.output("cann't find the link to download pdf file, please try to use proxy or change the proxy");
 			return;
 		}
 		pdflink = base + pdflink;
-		// 打开pdf的连接
-		// Nature网站在下载pdf文件的时候也必须挂上代理
 		HttpURLConnection con = null;
-		if (flag != -1)
-			con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
-		else
-			con = GetPDFUtil.createPDFLink(pdflink, cookies, usingProxy);
+		if (flag != -1) {
+            con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
+        } else {
+            con = GetPDFUtil.createPDFLink(pdflink, cookies, usingProxy);
+        }
 		int filesize = con.getContentLength();
-		// 下面从网站获取pdf文件
 		GetPDFUtil.getPDFFile(file, filesize, dig, con);
 		con.disconnect();
 	}

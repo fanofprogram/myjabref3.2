@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class Springer implements GetCite {
 
-	private String url;
+	private final String url;
 
 	public Springer(String url) {
 		this.url = url;
@@ -15,14 +15,11 @@ public class Springer implements GetCite {
 
 	@Override
 	public String getCiteItem() {
-		// 提交表单的网址基础地址
 		String beginUrl="http://link.springer.com/";
 		String endUrl=url.substring(beginUrl.length(), url.length());
 		String baseurl=beginUrl+"export-citation/"+endUrl;
 		String posturl=baseurl+".bib";
 
-		// *************下面向网站模拟提交表单数据************************
-		// AIP网站不是使用post提交的，用的get
 		HttpURLConnection con = null;
 		try {
 			URL u = new URL(posturl);
@@ -40,11 +37,8 @@ public class Springer implements GetCite {
 				con.disconnect();
 			}
 		}
-		// *************下面从网站获取返回的数据************************
-		// 读取返回内容
 		StringBuilder buffer = new StringBuilder();
 		try {
-			// 一定要有返回值，否则无法把请求发送给server端。
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					con.getInputStream(), "UTF-8"));
 			String temp;
@@ -62,7 +56,8 @@ public class Springer implements GetCite {
 	public static void main(String[] args) {
 		String str = "http://link.springer.com/chapter/10.1007/978-3-319-16640-7_3";
 		String sb = new Springer(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

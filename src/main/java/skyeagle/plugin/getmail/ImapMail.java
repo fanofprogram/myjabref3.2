@@ -56,15 +56,14 @@ import skyeagle.plugin.gui.UpdateDialog;
 
 public class ImapMail {
 
-    private static String dateFormat = "yyyy-MM-dd"; // Ĭ�ϵ�������ʾ��ʽ
-    // �ʼ��������Ͷ˿�
+    private static String dateFormat = "yyyy-MM-dd";
+
     // private String host = "imap.gmail.com";
     private final String host = "64.233.189.109";
     private final String port = "993";
-    // ���ô洢������ַ�ļ���
+
     private final ArrayList<String> urls = new ArrayList<>();
 
-    // �洢�Ѷ�ȡ�����ʼ�����
     private final TreeSet<String> readedDay = new TreeSet<>();
 
     // store info from setting dialog
@@ -91,14 +90,11 @@ public class ImapMail {
             Properties prop = new Properties();
             prop.load(bfr);
 
-            // ������û���������
             userName = prop.getProperty("username");
             String newPwd = prop.getProperty("password");
             userPassword = Endecrypt.convertMD5(newPwd);
-            // �ʼ����������ؼ���
-            searchKeyword = "ѧ��������Ѷ - [ " + prop.getProperty("searchkeyword") + " ]";
+            searchKeyword = prop.getProperty("searchkeyword");
 
-            // �������ڣ������ʼ����ڵıȽ�
             String dateString = prop.getProperty("startday");
             SimpleDateFormat sDateFormat = new SimpleDateFormat(dateFormat);
             startdate = sDateFormat.parse(dateString, new ParsePosition(0));
@@ -106,7 +102,7 @@ public class ImapMail {
             dateString = prop.getProperty("endday");
             sDateFormat = new SimpleDateFormat(dateFormat);
             enddate = sDateFormat.parse(dateString, new ParsePosition(0));
-            diag.output("��ʼ����Gmail����.....");
+            diag.output("Start to connect Gmail .....");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -114,7 +110,6 @@ public class ImapMail {
     }
 
     public ArrayList<String> getEmailContent() {
-        // ����session������
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         Properties prop = System.getProperties();
         prop.setProperty("mail.store.protocol", "imaps");
@@ -123,49 +118,38 @@ public class ImapMail {
         prop.setProperty("mail.imap.socketFactory.port", port);
         prop.setProperty("mail.imap.auth.plain.disable", "true");
         prop.setProperty("mail.imap.auth.login.disable", "true");
-        // ����sessionʵ��������
         try {
             Session session = Session.getInstance(prop);
             URLName urln = new URLName("imaps", host, 993, null, userName, userPassword);
 
             Store store = session.getStore(urln);
             store.connect();
-            // ���öԻ����е���ʾ��Ϣ��
-            diag.output("�Ѿ���������.");
-            diag.output("��ʼ��ȡ�ռ����е��ʼ�.....");
-            // ���ռ��䣬����ֻ��ģʽ
+            diag.output("already connected Gmail.");
+            diag.output("Start to get mail in Incoming Box.....");
             Folder folder = store.getFolder("INBOX");
             folder.open(Folder.READ_ONLY);
-            // �����ʼ�����ʼ�ͽ�������֮��
             SearchTerm stDate = new AndTerm(new ReceivedDateTerm(ComparisonTerm.GE, startdate),
                     new ReceivedDateTerm(ComparisonTerm.LE, enddate));
             SearchTerm st = new AndTerm(new FromStringTerm("scholaralerts-noreply@google.com"), stDate);
             Message[] messages = folder.search(st);
 
-            // ���öԻ����е���ʾ��Ϣ��
-            diag.output("�ռ����й���" + messages.length + "��" + searchKeyword + "�ʼ���");
+            diag.output("There are " + messages.length + " " + searchKeyword + " mails in Incoming Box.");
             if (messages.length != 0) {
-                diag.output("========��ʼ������Щ�ʼ�=========");
+                diag.output("Start to analysize all these mails.....");
                 for (Message message : messages) {
                     IMAPMessage msg = (IMAPMessage) message;
                     String subject = MimeUtility.decodeText(msg.getSubject());
-                    if (subject.equals(searchKeyword)) {
-                        // ��ȡ�ʼ��ķ������ڲ���ʾ
+                    if (subject.indexOf(searchKeyword) != -1) {
                         Date sentDate = msg.getSentDate();
                         SimpleDateFormat format = new SimpleDateFormat(dateFormat);
                         String strSentDate = format.format(sentDate);
-                        // ���öԻ����е���ʾ��Ϣ��
-                        diag.output("������������Ϊ" + strSentDate + "���ʼ�...");
+                        diag.output("Start to analysize the mail in " + strSentDate);
                         readedDay.add(strSentDate);
-                        // ��ȡ�ʼ�����,��Ϊ�ʼ�����Ϊ��text/html"�����Կ���
-                        // ����ֱ�ӻ�ȡ��
                         String strTmp = null;
                         if (msg.isMimeType("text/html")) {
                             if (msg.getContent() instanceof String) {
                                 strTmp = msg.getContent().toString();
                             } else if (msg.getContent() instanceof QPDecoderStream) {
-                                // ��ʱ�����ڱ�������ⷵ�صĲ����ַ��������Ǳ�������������Ҫ����ĳ���
-                                // ������ַ���
                                 BufferedInputStream bis = new BufferedInputStream((InputStream) msg.getContent());
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 while (true) {
@@ -176,7 +160,6 @@ public class ImapMail {
                                     baos.write(c);
                                 }
                                 strTmp = new String(baos.toByteArray());
-                                // ���ɵ��ַ�����������'%'�͡�+'������������ĳ�����Ǳ����������
                                 try {
                                     StringBuffer tempBuffer = new StringBuffer();
                                     int incrementor = 0;
@@ -201,7 +184,6 @@ public class ImapMail {
                                 }
                             }
                         }
-                        // ���ʼ��л�ȡ��ַ
                         ArrayList<String> al = getURL(strTmp);
                         urls.addAll(al);
                     }
@@ -211,7 +193,7 @@ public class ImapMail {
             folder.close(false);
             store.close();
         } catch (Exception e) {
-            frame.showMessage("����������Gmail���䣬�����û�������������硣");
+            frame.showMessage("can't connect Gmail, please check username , password and network.");
             diag.close();
         }
         return urls;
@@ -221,8 +203,6 @@ public class ImapMail {
         BufferedWriter bfw = null;
         BufferedReader bfr = null;
         try {
-            // �ȶ�ȡԭ���ļ��е����ڣ�
-            // readedDay ��treeset���ϣ������ظ�����������Ȼ��
             Properties prop = new Properties();
             if (dayfile.exists()) {
                 bfr = new BufferedReader(new FileReader(dayfile));
@@ -236,7 +216,6 @@ public class ImapMail {
                     }
                 }
             }
-            // �����ڵ����ڸ������������´����ļ���
             prop.setProperty("count", String.valueOf(readedDay.size()));
             int i = 1;
             for (Iterator<String> it = readedDay.iterator(); it.hasNext(); i++) {
@@ -266,29 +245,21 @@ public class ImapMail {
                 break;
             }
             endIndex = strTmp.indexOf(">", beginIndex);
-            // ��Ҫ��ʼ��href="������"
             beginIndex = beginIndex + 6;
             endIndex = endIndex - 1;
             String url = strTmp.substring(beginIndex, endIndex);
             al.add(url);
         }
 
-        // ���������ַû�ã�ȥ����ע���������Ǽ�һ
-        // ��һ������Ŀ�����仯�ˡ�
         al.remove(al.size() - 1);
         al.remove(al.size() - 1);
-        // ȥ��google��������Ϣ��ֻ��������ַ��
         String element = null;
         for (int i = 0; i < al.size(); i++) {
             String tmpStr = al.get(i);
-            // ���ҵڶ���http�����Դ�10��ʼ����һ����google��
             int begin = tmpStr.indexOf("http", 10);
-            // �п���google�����в�������ַ����ô�Ͳ�����google���޳�
-            // begin������-1��������
             try {
                 if (begin != -1) {
                     int end = tmpStr.indexOf("&amp;", 10);
-                    // google����ַ�е�������Ž����˱��룬�����Ҫ���н��롣
                     element = URLDecoder.decode(tmpStr.substring(begin, end), "utf-8");
                 } else {
                     element = URLDecoder.decode(tmpStr.substring(0, tmpStr.length()), "utf-8");
@@ -296,7 +267,6 @@ public class ImapMail {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            // ���öԻ����е���ʾ��Ϣ��
             diag.output(element);
             al.set(i, element);
         }
@@ -304,14 +274,12 @@ public class ImapMail {
     }
 
     public static String getItem(String itemUrl, UpdateDialog diag) {
-        // ö�٣������������ܹ���ȡ�������õ�����
         UrlKeywords tmp[] = UrlKeywords.values();
 
         String urlClassName = null;
         String itemString = null;
         boolean isFind = false;
 
-        // ѭ���жϸ�����ַ�����Ǹ��࣬��ȡ���ڴ��������ַ���������
         for (UrlKeywords className : tmp) {
             if (className.isThisUrl(itemUrl)) {
                 urlClassName = className.name();
@@ -320,21 +288,16 @@ public class ImapMail {
             }
         }
 
-        // �ҵ������Ժ�ʹ�÷�����ö�Ӧ����
         if (isFind) {
             try {
-                // ������������class��ʵ��
                 Class<?> clazz = Class.forName("skyeagle.plugin.geturlcite." + urlClassName);
-                // ������Ӧ��Ĺ��캯��
                 Constructor<?> con = clazz.getConstructor(String.class);
-                // ���ɶ�Ӧ���ʵ��
                 GetCite getCite = (GetCite) con.newInstance(itemUrl);
-                // ���ö�Ӧ��ķ�����ȡ��������
                 itemString = getCite.getCiteItem();
                 if (itemString != null) {
-                    diag.output("��ɶ�" + itemUrl + "���������õĻ�ȡ��");
+                    diag.output("Getting  the reference in " + itemUrl + " is done.");
                 } else {
-                    diag.output("�޷�����" + itemUrl + "�� �������硣");
+                    diag.output("cann't connect the " + itemUrl + ", please check the network.");
                     return null;
                 }
             } catch (Exception e) {
@@ -342,18 +305,13 @@ public class ImapMail {
             }
 
         } else {
-            diag.output("�Ҳ���" + itemUrl + "��ƥ������");
+            diag.output("cann't find the rule which correspond to" + itemUrl);
         }
         return itemString;
     }
 
-    /*
-     * �������ַ������뵽jabref�У�ʹ����jabref�ĵ���Ի���
-     */
     public void setItems(String sbEntries) {
         try {
-
-            // ����jabref�еĺ������ַ���ת���Ժ󣬵��뵽jabref��
             BasePanel panel = frame.getCurrentBasePanel();
             ParserResult pr = BibtexParser.parse(new StringReader(sbEntries.toString()));
             List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
@@ -362,10 +320,9 @@ public class ImapMail {
             diagImporter.addEntries(entries);
             diagImporter.entryListComplete();
 
-            // ����Ի�����������
             diagImporter.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-            Toolkit kit = Toolkit.getDefaultToolkit(); // ���幤�߰�
-            Dimension screenSize = kit.getScreenSize(); // ��ȡ��Ļ�ĳߴ�
+            Toolkit kit = Toolkit.getDefaultToolkit();
+            Dimension screenSize = kit.getScreenSize();
             Point pt = new Point();
             pt.x = screenSize.width / 4;
             pt.y = screenSize.height / 4;

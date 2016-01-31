@@ -32,6 +32,7 @@ public class DownloadFileCommand {
     private final File file = new File(pluginDir, "proxy.prop");
     public Boolean usingProxy = false;
 
+
     public DownloadFileCommand(JabRefFrame f) {
         frame = f;
         int select = JOptionPane.showConfirmDialog(frame, "Use proxy to download PDF file?", "Confim",
@@ -76,7 +77,7 @@ class DownloadFile implements Runnable {
 
     @Override
     public void run() {
-        dig.output("��ʼ�����������أ�");
+        dig.output("Start to download file:");
 
         for (BibEntry be : bes) {
             String url = be.getField("url");
@@ -91,7 +92,7 @@ class DownloadFile implements Runnable {
                         FileListTableModel tm = new FileListTableModel();
                         tm.setContent(be.getField("file"));
                         ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-                        FileListEntry fle = new FileListEntry(name, null, fileType);
+                        FileListEntry fle = new FileListEntry(name, file.toString(), fileType);
                         UpdateField.getNewLink(fle, file, metaData);
                         tm.addEntry(0, fle);
                         be.setField("file", tm.getStringRepresentation());
@@ -118,33 +119,36 @@ class DownloadFile implements Runnable {
         List<String> fileDir = md.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
-        for (String dir : directories) {
-            if (!al.contains(dir)) {
-                al.add(dir);
-            }
-        }
         for (String aFileDir : fileDir) {
             if (!al.contains(aFileDir)) {
-                al.add(aFileDir);
+                if (!aFileDir.isEmpty()) {
+                    al.add(aFileDir);
+                }
+            }
+        }
+        for (String dir : directories) {
+            if (!al.contains(dir)) {
+                if (!dir.isEmpty()) {
+                    al.add(dir);
+                }
             }
         }
         for (String dir : al) {
             if (dir != null) {
-                    if (dir.endsWith(System.getProperty("file.separator"))) {
-                        name = dir + name;
-                    } else {
-                        name = dir + System.getProperty("file.separator") + name;
-                    }
-                    // fix / and \ problems:
-                    Pattern SLASH = Pattern.compile("/");
-                    Pattern BACKSLASH = Pattern.compile("\\\\");
-                    if (OS.WINDOWS) {
-                        name = SLASH.matcher(name).replaceAll("\\\\");
-                    } else {
-                        name = BACKSLASH.matcher(name).replaceAll("/");
-                    File fileInDir = new File(name);
-                    return fileInDir;
+                if (dir.endsWith(System.getProperty("file.separator"))) {
+                    name = dir + name;
+                } else {
+                    name = dir + System.getProperty("file.separator") + name;
                 }
+                // fix / and \ problems:
+                Pattern SLASH = Pattern.compile("/");
+                Pattern BACKSLASH = Pattern.compile("\\\\");
+                if (OS.WINDOWS) {
+                    name = SLASH.matcher(name).replaceAll("\\\\");
+                } else {
+                    name = BACKSLASH.matcher(name).replaceAll("/");
+                }
+                return new File(name);
             }
         }
         return null;

@@ -75,7 +75,7 @@ class UpdateField implements Runnable {
 				url=CommandUtil.DOItoURL(url);
 				String item = ImapMail.getItem(url, dig);
 				if (item == null) {
-                    dig.output("��ַ" + url + "�������û�ȡʧ��");
+                    dig.output("Program can't get item from " + url);
 				} else {
                     BibEntry oldEntry = bes[i];
                     BibEntry newEntry = BibtexParser.singleFromString(item);
@@ -83,12 +83,12 @@ class UpdateField implements Runnable {
 				}
 			} else {
 				int id = panel.mainTable.findEntry(bes[i]) + 1;
-                dig.output("��" + id + "����¼û����ַ���޷�����");
+                dig.output("The " + id + "item don't have the url.");
 				continue;
 			}
 
 		}
-        dig.btnCancel.setText("�رնԻ���");
+        dig.btnCancel.setText("Close the dialog");
 	}
 
     private void checkAndUpdate(BibEntry oldEntry, BibEntry newEntry) {
@@ -100,7 +100,7 @@ class UpdateField implements Runnable {
 				int id = panel.mainTable.findEntry(oldEntry) + 1;
 				String oldField = oldEntry.getField(fields[i]);
 				String newField = newEntry.getField(fields[i]);
-                dig.output("����" + id + "����¼��" + fields[i] + "��" + oldField + "��Ϊ" + newField);
+                dig.output("The " + fields[i] + " of " + id + " item was changed from " + oldField + " to " + newField);
 				oldEntry.setField(fields[i], newField);
 			}
 		}
@@ -127,7 +127,7 @@ class UpdateField implements Runnable {
 					if ((file != null) && file.exists()) {
 						File dir = file.getParentFile();
 						File newFile = new File(dir, newLink);
-                        dig.output("���ļ�" + file.getAbsolutePath() + "�����˸�����");
+                        dig.output("The name of " + file.getAbsolutePath() + " was changed.");
 						file.renameTo(newFile);
 						getNewLink(fle, newFile,metaData);
 						entry.setField("file", tm.getStringRepresentation());
@@ -136,7 +136,7 @@ class UpdateField implements Runnable {
 			}
 		} else {
 			int id = panel.mainTable.findEntry(entry) + 1;
-            dig.output("��" + id + "����¼û�������ļ�������Ҫ�����ļ�������");
+            dig.output("The " + id + " item don't have file link,  don't need change the file name.");
 		}
 	}
 

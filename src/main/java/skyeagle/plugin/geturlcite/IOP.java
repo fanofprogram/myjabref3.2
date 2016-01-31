@@ -14,7 +14,7 @@ import org.jsoup.select.Elements;
 
 public class IOP implements GetCite {
 
-	private String url;
+	private final String url;
 
 	public IOP(String url) {
 		this.url = url;
@@ -22,16 +22,12 @@ public class IOP implements GetCite {
 
 	@Override
 	public String getCiteItem() {
-		// 提交表单的网址
 		String baseurl = "http://iopscience.iop.org/";
 
-		// 获取articleID
 		Elements ele = null;
 		String posturl = null;
 		try {
 			Document doc = Jsoup.connect(url).ignoreHttpErrors(true).timeout(30000).get();
-			// 获取引用文件的文件名
-			//articleID = doc.select("input[name=articleID]").attr("value");
 			ele = doc.select("span#articleId");
 			String articleID=ele.get(0).text();
 			posturl = baseurl
@@ -39,18 +35,12 @@ public class IOP implements GetCite {
 					+ URLEncoder.encode(articleID, "utf-8")
 					+ "&exportFormat=iopexport_bib&exportType=abs&navsubmit=Export%2Babstract";
 		} catch (UnsupportedEncodingException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 			return null;
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 			return null;
 		}
-
-		// *************下面向网站模拟提交表单数据************************
-		// 我们这里直接用我们的数据提交，不用在网页上选择了。
-		//IOP使用get方法提交
 
 		HttpURLConnection con = null;
 		try {
@@ -72,11 +62,8 @@ public class IOP implements GetCite {
 			}
 		}
 
-		// *************下面从网站获取返回的数据************************
-		// 读取返回内容
 		StringBuilder buffer = new StringBuilder();
 		try {
-			// 一定要有返回值，否则无法把请求发送给server端。
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					con.getInputStream(), "UTF-8"));
 			String temp;
@@ -91,10 +78,11 @@ public class IOP implements GetCite {
 		return buffer.toString();
 	}
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 		String str = "http://iopscience.iop.org/article/10.7567/APEX.8.121301/meta";
 		String sb = new IOP(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

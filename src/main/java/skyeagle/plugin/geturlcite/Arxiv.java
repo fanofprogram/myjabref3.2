@@ -12,27 +12,23 @@ import org.jsoup.select.Elements;
 
 public class Arxiv implements GetCite {
 
-	private String url;
+	private final String url;
 	private final String NEWLINE = System.getProperty("line.separator");
 
 	public Arxiv(String url) {
-		//如果是pdf的话，相当于直接下载，不能获取引用。
 		this.url = url.replaceAll("pdf", "abs");
 	}
 
 	@Override
 	public String getCiteItem() {
-		TreeMap<String, String> map=new TreeMap<String, String>();
-		// arvix网页中包含有引用的元素，尝试直接抓取
+        TreeMap<String, String> map = new TreeMap<>();
 		Document doc=null;
 		try {
 			doc = Jsoup.connect(url).timeout(30000).get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		// meta元素
 		int authorIndex=1;
 		Elements eles = doc.select("meta");
 		for (Element ele : eles) {
@@ -45,11 +41,11 @@ public class Arxiv implements GetCite {
 			String value=ele.attr("content");
 			map.put(key, value);
 		}
-		
+
 		String abs=doc.select("blockquote.abstract").text();
 		map.put("citation_abstract", abs);
-						
-		
+
+
 		//generate bib item
 		StringBuilder sb=new StringBuilder();
 		sb.append("@article{"+NEWLINE);
@@ -72,7 +68,9 @@ public class Arxiv implements GetCite {
 				key="year";
 				value=value.substring(0, 4);
 			}
-			if(key.indexOf("online")!=-1)continue;
+			if(key.indexOf("online")!=-1) {
+                continue;
+            }
 			if(key.equals("arxiv_id")){
 				key="journal";
 				value="arXiv preprint arXiv:"+value;
@@ -88,7 +86,8 @@ public class Arxiv implements GetCite {
 	public static void main(String[] args) {
 		String str = "http://arxiv.org/pdf/1504.06082";
 		String sb = new Arxiv(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

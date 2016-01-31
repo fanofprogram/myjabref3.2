@@ -8,8 +8,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
-
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,42 +17,43 @@ import skyeagle.plugin.gui.UpdateDialog;
 
 public class APS implements GetPdfFile {
 
-	private String url;
+	private final String url;
 
 	public APS(String url) {
 		this.url = url;
 	}
 
-	public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
-		
-		dig.output("APS要进行爱因斯坦头像认证，现在还解决不了，请手工下载");
+    @Override
+    public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
+
+        dig.output("APS need to click the image of Einstan head, now this problem can't solve.");
 		return;
-//		// 获取网址的内容（html)和cookies
+        //		// 锟斤拷取锟斤拷址锟斤拷锟斤拷锟捷ｏ拷html)锟斤拷cookies
 //		Map<String, String> cookies = new TreeMap<>();
 //		String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
 //		if (pagecontent == null) {
-//			dig.output("网络不通，请检查代理和网络。");
+        //			dig.output("锟斤拷锟界不通锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟界。");
 //			return;
 //		}
-//		// 使用Jsoup库对html内容进行解析
+        //		// 使锟斤拷Jsoup锟斤拷锟絟tml锟斤拷锟捷斤拷锟叫斤拷锟斤拷
 //		Document doc = Jsoup.parse(pagecontent);
-//		// 利用Jsoup中的选择器寻找需要的节点, 这里要找的是pdf文件的连接
+        //		// 锟斤拷锟斤拷Jsoup锟叫碉拷选锟斤拷锟斤拷寻锟斤拷锟斤拷要锟侥节碉拷, 锟斤拷锟斤拷要锟揭碉拷锟斤拷pdf锟侥硷拷锟斤拷锟斤拷锟斤拷
 //		String orglink = doc.select("div[class=article-nav-actions]>a").attr("href");
 //		if (orglink.isEmpty()) {
-//			// dig.output("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
-//			System.out.println("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
+        //			// dig.output("页锟斤拷锟斤拷锟揭诧拷锟斤拷锟斤拷锟斤拷pdf锟侥硷拷锟斤拷锟斤拷锟接ｏ拷锟诫尝锟斤拷使锟矫达拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷");
+        //			System.out.println("页锟斤拷锟斤拷锟揭诧拷锟斤拷锟斤拷锟斤拷pdf锟侥硷拷锟斤拷锟斤拷锟接ｏ拷锟诫尝锟斤拷使锟矫达拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷");
 //			return;
 //		}
 //
 //		testEinstein(orglink, cookies);
-//		
+//
 //		String pdflink = "http://journals.aps.org" + orglink;
 //
-//		// 打开pdf的连接
-//		// 使用cookies
+        //		// 锟斤拷pdf锟斤拷锟斤拷锟斤拷
+        //		// 使锟斤拷cookies
 //		HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
 //		int filesize = con.getContentLength();
-//		// 下面从网站获取pdf文件
+        //		// 锟斤拷锟斤拷锟斤拷锟秸撅拷锟饺df锟侥硷拷
 //		GetPDFUtil.getPDFFile(file, filesize, dig, con);
 //		con.disconnect();
 
@@ -62,7 +61,7 @@ public class APS implements GetPdfFile {
 
 	private void testEinstein(String orglink, Map<String, String> cookies) {
 		Document doc;
-		// APS网站要选择爱因斯坦进行验证
+        // APS锟斤拷站要选锟斤拷锟斤拷斯坦锟斤拷锟斤拷锟斤拷证
 		String link = "http://journals.aps.org" + orglink;
 		try {
 			doc = Jsoup.connect(link).cookies(cookies).ignoreHttpErrors(true).timeout(30000).get();
@@ -84,20 +83,20 @@ public class APS implements GetPdfFile {
 
 			URL u = new URL(posturl);
 			HttpURLConnection con = (HttpURLConnection) u.openConnection();
-			// 提交表单方式为POST，POST 只能为大写，严格限制，post会不识别
+            // 锟结交锟斤拷锟斤拷式为POST锟斤拷POST 只锟斤拷为锟斤拷写锟斤拷锟较革拷锟斤拷锟狡ｏ拷post锟结不识锟斤拷
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
 			con.setDoInput(true);
 			con.setUseCaches(false);
-			// 表示我们的连接为纯文本，编码为utf-8
+            // 锟斤拷示锟斤拷锟角碉拷锟斤拷锟斤拷为锟斤拷锟侥憋拷锟斤拷锟斤拷锟斤拷为utf-8
 			con.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
 			OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-			// 向网站写表单数据
+            // 锟斤拷锟斤拷站写锟斤拷锟斤拷锟斤拷
 			osw.write(postconten);
 			osw.flush();
 			osw.close();
 
-			// 获取cookie
+            // 锟斤拷取cookie
 			String key = null;
 			for (int i = 1; (key = con.getHeaderFieldKey(i)) != null; i++) {
 				if (key.equalsIgnoreCase("set-cookie")) {
@@ -105,7 +104,7 @@ public class APS implements GetPdfFile {
 					cookie = con.getHeaderField(i);
 					int i1 = cookie.indexOf("=");
 					int i2 = cookie.indexOf(";");
-					if (i1 != -1 && i2 != -1) {
+					if ((i1 != -1) && (i2 != -1)) {
 						String _value = cookie.substring(i1 + 1, i2);
 						String _key = cookie.substring(0, i1);
 						cookies.put(_key, _value);

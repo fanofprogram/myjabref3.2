@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document;
 
 public class Nature implements GetCite {
 
-	private String url;
+	private final String url;
 	private final String NEWLINE = System.getProperty("line.separator");
 	public Nature(String url) {
 		this.url = url;
@@ -22,17 +22,13 @@ public class Nature implements GetCite {
 		String ris="http://www.nature.com";
 		try {
 			Document doc=Jsoup.connect(url).ignoreHttpErrors(true).timeout(60000).get();
-			//找到ris文件的连接，href$表示href的值的末尾为.ris
 			String links=doc.select("a[href$=.ris]").attr("href");
 			ris=ris+links;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		
-		// *************下面向网站模拟提交表单数据************************
-				// Nature网站不是使用post提交的，用的get
+
 				HttpURLConnection con = null;
 				try {
 					URL u = new URL(ris);
@@ -50,16 +46,12 @@ public class Nature implements GetCite {
 						con.disconnect();
 					}
 				}
-				// *************下面从网站获取返回的数据************************
-				// 读取返回内容
 				StringBuilder sb=new StringBuilder();
 				StringBuilder authors=new StringBuilder();
 				try {
-					// 一定要有返回值，否则无法把请求发送给server端。
 					BufferedReader br = new BufferedReader(new InputStreamReader(
 							con.getInputStream(), "UTF-8"));
 
-					// *************下面将获得的ris的内容变为bibtex格式***********
 					sb.append("@article{"+NEWLINE);
 					String temp;
 					while ((temp = br.readLine()) != null) {
@@ -80,25 +72,24 @@ public class Nature implements GetCite {
 						}else if(temp.indexOf("VL")!=-1){
 							sb.append("Volume={"+temp.substring(6)+"},"+NEWLINE);
 						}
-						
-						//sb.append(temp);
-						//sb.append("\n");
+
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					return null;
 				}
-				
+
 				String tmpStr=authors.toString();
 				sb.append("author={"+tmpStr.substring(0, tmpStr.length()-5)+"}"+NEWLINE);
 				sb.append("}");
 				return sb.toString();
 	}
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 		String str = "http://www.nature.com/articles/srep18386";
 		String sb = new Nature(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

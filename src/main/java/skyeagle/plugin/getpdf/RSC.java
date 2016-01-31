@@ -1,7 +1,6 @@
 package skyeagle.plugin.getpdf;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,39 +9,42 @@ import skyeagle.plugin.gui.UpdateDialog;
 
 public class RSC implements GetPdfFile {
 
-	private String url;
+    private final String url;
 
-	public RSC(String url) {
-		url = url.toLowerCase();
-		if (url.indexOf("articlepdf") != -1)
-			url = url.replaceAll("articlepdf", "articlehtml");
-		else if (url.indexOf("articlelanding") != -1)
-			url = url.replaceAll("articlelanding", "articlehtml");
-		this.url = url;
-	}
 
-	@Override
-	public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
-		// 获取网址的内容（html)和cookies
-		Map<String, String> cookies = new TreeMap<>();
-		String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
-		if (pagecontent == null) {
-			dig.output("代理设置错误。");
-			return;
-		}
-		String pdflink = url.replaceAll("articlehtml", "articlepdf");
-		// 打开pdf的连接
-		// 由于使用代理获得了cookies。这时候，使用cookies相当于使用了代理，所以不用再挂代理了
-		HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
-		int filesize = con.getContentLength();
-		// 下面从网站获取pdf文件
-		GetPDFUtil.getPDFFile(file, filesize, dig, con);
-		con.disconnect();
-	}
+    public RSC(String url) {
+        url = url.toLowerCase();
+        if (url.indexOf("articlepdf") != -1) {
+            url = url.replaceAll("articlepdf", "articlelanding");
+        } else if (url.indexOf("articlehtml") != -1) {
+            url = url.replaceAll("articlehtml", "articlelanding");
+        }
+        this.url = url;
+    }
 
-	public static void main(String[] args) throws IOException {
-		String str = "http://pubs.rsc.org/en/Content/ArticleLanding/2015/TA/C5TA07526B";
-		File file = new File("E:\\test.pdf");
-		new RSC(str).getFile(new UpdateDialog(null, "down"), file, true);
-	}
+    @Override
+    public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
+        Map<String, String> cookies = new TreeMap<>();
+        String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
+        if (pagecontent == null) {
+            dig.output("The network don't work, please check proxy and network.");
+            return;
+        }
+        String pdflink = url.replaceAll("articlelanding", "articlepdf");
+        HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
+        String type = con.getHeaderField("Content-Type");
+        if (type.indexOf("pdf") == -1) {
+            dig.output("cann't find the link to download pdf file, please try to use proxy or change the proxy");
+            return;
+        }
+        int filesize = con.getContentLength();
+        GetPDFUtil.getPDFFile(file, filesize, dig, con);
+        con.disconnect();
+    }
+
+    public static void main(String[] args) {
+        String str = "http://pubs.rsc.org/en/Content/ArticleLanding/2015/TA/C5TA07526B";
+        File file = new File("E:\\test.pdf");
+        new RSC(str).getFile(new UpdateDialog(null, "down"), file, false);
+    }
 }

@@ -12,7 +12,7 @@ import org.jsoup.select.Elements;
 
 public class IEEE implements GetCite {
 
-	private String url;
+	private final String url;
 	private final String NEWLINE = System.getProperty("line.separator");
 
 	public IEEE(String url) {
@@ -21,21 +21,19 @@ public class IEEE implements GetCite {
 
 	@Override
 	public String getCiteItem() {
-		// 直接进行抓取元元素
 		Document doc = null;
 		try {
 			doc = Jsoup.connect(url).timeout(30000).get();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		TreeMap<String, String> map = new TreeMap<String, String>();
+        TreeMap<String, String> map = new TreeMap<>();
 		Elements eles = doc.select("meta");
 		int authorIndex = 0;
 		for (Element ele : eles) {
 			String key = ele.attr("name");
-			if (!key.isEmpty() && key.indexOf("citation") != -1) {
+			if (!key.isEmpty() && (key.indexOf("citation") != -1)) {
 				if (key.equals("citation_author")) {
 					map.put(key + authorIndex, ele.attr("content"));
 					authorIndex++;
@@ -55,7 +53,7 @@ public class IEEE implements GetCite {
 			String key = it.next();
 			String value = map.get(key);
 			key = key.substring("citation_".length(), key.length());
-			if (key.indexOf("author") != -1 && key.indexOf("institution") == -1) {
+			if ((key.indexOf("author") != -1) && (key.indexOf("institution") == -1)) {
 				authors.append(value + " and ");
 				continue;
 			} else if (key.equals("keywords")) {
@@ -94,11 +92,12 @@ public class IEEE implements GetCite {
 		return sb.toString();
 	}
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 		String str = "http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=7104418";
 		String sb = new IEEE(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 
 	}
 }

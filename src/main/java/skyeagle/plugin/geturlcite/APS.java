@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class APS implements GetCite {
 
-	private String url;
+	private final String url;
 
 	public APS(String url) {
 		this.url = url;
@@ -15,12 +15,9 @@ public class APS implements GetCite {
 
 	@Override
 	public String getCiteItem() {
-		// 提交表单的网址基础地址
 		String baseurl=url.replaceAll("abstract", "export");
 		String posturl=baseurl+"?type=bibtex&download=true";
 
-		// *************下面向网站模拟提交表单数据************************
-		// APS用的get
 		HttpURLConnection con = null;
 		try {
 			URL u = new URL(posturl);
@@ -38,11 +35,8 @@ public class APS implements GetCite {
 				con.disconnect();
 			}
 		}
-		// *************下面从网站获取返回的数据************************
-		// 读取返回内容
 		StringBuilder buffer = new StringBuilder();
 		try {
-			// 一定要有返回值，否则无法把请求发送给server端。
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					con.getInputStream(), "UTF-8"));
 			String temp;
@@ -60,7 +54,8 @@ public class APS implements GetCite {
 	public static void main(String[] args) {
 		String str = "http://journals.aps.org/prb/abstract/10.1103/PhysRevB.92.094307";
 		String sb = new APS(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

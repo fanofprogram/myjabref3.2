@@ -12,19 +12,15 @@ public class UpdateGmailCommand {
 	private final GetMails getMail;
 
 	public UpdateGmailCommand(JabRefFrame frame) {
-        //�����Ի���
 		dialog = new UpdateDialog(frame, "Importing Gmail content");
 		gmail = new ImapMail(frame, dialog);
-        //�����ʼ�������ȡ���õ��߳�
 		getMail = new GetMails(dialog,gmail);
 		Thread mail = new Thread(getMail);
 		mail.start();
 
 		dialog.setVisible(true);
 
-        // û������item�Ļ��Ͳ��������׵������
 		if (getMail.sbEntries.length() != 0) {
-            //�������׵����
 			gmail.setItems(getMail.sbEntries.toString());
         }
 	}
@@ -46,16 +42,14 @@ class GetMails implements Runnable {
         ArrayList<String> urls = new ArrayList<>();
         ArrayList<String> sbNotRec = new ArrayList<>();
 
-        // ��ȡ�ʼ��е�������ַ
 		urls = gmail.getEmailContent();
-        dialog.output("��ʼ��ȡ��ַ�е�������Ϣ.....");
+        dialog.output("Start to get item infomation in the url .....");
 
-        // ͨ��ѭ������ȡ������ַ�е����ã����stop�Ļ���ֹͣ��ȡ
 		int numUrl = 0;
 		while ((urls != null) && !dialog.stop && (numUrl < urls.size())) {
 			String item = ImapMail.getItem(urls.get(numUrl),dialog);
 			if (item == null) {
-                dialog.output("��ַ" + urls.get(numUrl) + "�������û�ȡʧ��");
+                dialog.output("fail to get item in" + urls.get(numUrl));
 				sbNotRec.add(urls.get(numUrl));
 			} else {
 				sbEntries.append(item);
@@ -64,11 +58,12 @@ class GetMails implements Runnable {
 		}
 
         // �ܽ���Ϣ
-        dialog.output("��������" + urls.size() + "ƪ�������" + sbNotRec.size() + "ƪû���ܹ���ȡ��������Ϣ��");
+        dialog.output("There are " + urls.size() + " items, however the follow " + sbNotRec.size()
+                + " items can't get information");
 		for (int i = 0; i < sbNotRec.size(); i++) {
 			dialog.output(sbNotRec.get(i));
 		}
-        dialog.output("��������������õ��ռ���");
-        dialog.btnCancel.setText("�رնԻ���");
+        dialog.output("all items was collected. ");
+        dialog.btnCancel.setText("Close Dialog");
 	}
 }

@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document;
 
 public class AIP implements GetCite {
 
-	private String url;
+	private final String url;
 
 	public AIP(String url) {
 		this.url = url;
@@ -19,29 +19,21 @@ public class AIP implements GetCite {
 
 	@Override
 	public String getCiteItem() {
-		// 提交表单的网址基础地址
 		String baseurl = "http://scitation.aip.org/";
 
-		// 获取bibtex的表单地址
 		String formUrl = null;
 		try {
-			// 下面的网址是下载引用文件表单的网址
 			Document doc = Jsoup.connect(url).timeout(30000).get();
-			// 获取引用文件的文件名
 			formUrl= doc.select(":contains(bibtex)").attr("href");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 		String posturl=baseurl+formUrl;
 
-		// *************下面向网站模拟提交表单数据************************
-		// AIP网站不是使用post提交的，用的get
 		HttpURLConnection con = null;
 		try {
 			URL u = new URL(posturl);
@@ -59,17 +51,13 @@ public class AIP implements GetCite {
 				con.disconnect();
 			}
 		}
-		// *************下面从网站获取返回的数据************************
-		// 读取返回内容
 		StringBuilder buffer = new StringBuilder();
 		try {
-			// 一定要有返回值，否则无法把请求发送给server端。
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					con.getInputStream(), "UTF-8"));
 			String temp;
 			String eid=null;
 			while ((temp = br.readLine()) != null) {
-				// 将eid的值给pages
 				if (temp.indexOf("eid")!=-1) {
 					eid = temp.substring(temp.length()-7, temp.length()-1);
 				}
@@ -90,7 +78,8 @@ public class AIP implements GetCite {
 	public static void main(String[] args) {
 		String str = "http://scitation.aip.org/content/aip/journal/jap/117/15/10.1063/1.4918311";
 		String sb = new AIP(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

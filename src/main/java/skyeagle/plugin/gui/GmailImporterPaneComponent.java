@@ -135,7 +135,7 @@ public class GmailImporterPaneComponent extends SidePaneComponent implements Act
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         add(main);
-        setName("GmailImporter");
+        setName("Import and Download");
     }
 
     @Override
@@ -143,11 +143,11 @@ public class GmailImporterPaneComponent extends SidePaneComponent implements Act
         super.setActiveBasePanel(panel);
         if (panel == null) {
             boolean status = Globals.prefs.getBoolean(JabRefPreferences.PLUGIN_VISIBLE);
-            manager.hide("GmailImporter");
+            manager.hide("Import and Download");
             Globals.prefs.putBoolean(JabRefPreferences.PLUGIN_VISIBLE, status);
         } else {
             if (Globals.prefs.getBoolean(JabRefPreferences.PLUGIN_VISIBLE)) {
-                manager.show("GmailImporter");
+                manager.show("Import and Download");
             }
         }
     }
@@ -207,12 +207,12 @@ public class GmailImporterPaneComponent extends SidePaneComponent implements Act
 
     @Override
     public void componentOpening() {
-        Globals.prefs.putBoolean("GmailImporter", true);
+        Globals.prefs.putBoolean("Import and Download", true);
     }
 
     @Override
     public void componentClosing() {
-        Globals.prefs.putBoolean("GmailImporter", false);
+        Globals.prefs.putBoolean("Import and Download", false);
     }
 
     public Action getAction() {

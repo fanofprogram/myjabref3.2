@@ -120,7 +120,7 @@ public class UpdateDialog extends JDialog implements ActionListener {
 
 	public void downloadRatioOutput(File file, int ratio, int totalDown, int getFileSize) {
 		String content = taskOutput.getText();
-        String tips = "File " + file.getAbsolutePath();
+        String tips = file.getAbsolutePath();
 		int tmpNum = 0;
 		int newNum = 0;
 		String lastStr = null;
@@ -128,12 +128,12 @@ public class UpdateDialog extends JDialog implements ActionListener {
 			lastStr = "KB";
 			tmpNum = lastStr.length();
 			newNum = totalDown/1024;
-            tips = tips + " size is:";
+            tips = "The downloading size of " + tips + " is:";
 		} else {
 			lastStr = "%";
 			tmpNum = lastStr.length();
 			newNum = ratio;
-            tips = tips + "ratio is:";
+            tips = "The downloading ratio of " + tips + " is:";
 		}
 		int beginIndex = content.indexOf(tips);
 		if (beginIndex == -1) {

@@ -11,22 +11,22 @@ import org.jsoup.nodes.Document;
 
 public class Science implements GetCite {
 
-	private String url;
+	private final String url;
 	public Science(String url) {
 		this.url = url;
 	}
 
-	public String getCiteItem() {
+	@Override
+    public String getCiteItem() {
 		String refUrl="http://science.sciencemag.org";
 		try {
 			Document doc=Jsoup.connect(url).timeout(30000).get();
 			String link=doc.select("li[class=bibtext first]>a").attr("href");
 			refUrl=refUrl+link;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		HttpURLConnection con = null;
 		try {
 			URL u = new URL(refUrl);
@@ -44,8 +44,6 @@ public class Science implements GetCite {
 				con.disconnect();
 			}
 		}
-		// *************下面从网站获取返回的数据************************
-		// 读取返回内容
 		StringBuilder buffer = new StringBuilder();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -53,7 +51,6 @@ public class Science implements GetCite {
 			String temp;
 			String eid=null;
 			while ((temp = br.readLine()) != null) {
-				// 将eid的值给pages
 				if (temp.indexOf("eid")!=-1) {
 					eid = temp.substring(temp.length()-7, temp.length()-1);
 				}
@@ -70,10 +67,12 @@ public class Science implements GetCite {
 		}
 		return buffer.toString();
 	}
-	public static void main(String[] args) throws IOException {
+
+    public static void main(String[] args) {
 		String str = "http://science.sciencemag.org/content/early/2015/11/24/science.aad3749.abstract";
 		String sb = new Science(str).getCiteItem();
-		if (sb != null)
-			System.out.println(sb);
+		if (sb != null) {
+            System.out.println(sb);
+        }
 	}
 }

@@ -732,7 +732,7 @@ public final class JabRefPreferences {
         defaults.put(DB_CONNECT_USERNAME, "root");
         CleanUpAction.putDefaults(defaults);
 
-        defaults.put(PLUGIN_VISIBLE, Boolean.FALSE);
+        defaults.put(PLUGIN_VISIBLE, Boolean.TRUE);
 
         // defaults for DroppedFileHandler UI
         defaults.put(DroppedFileHandler.DFH_LEAVE, Boolean.FALSE);
