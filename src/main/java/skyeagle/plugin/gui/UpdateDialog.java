@@ -119,28 +119,31 @@ public class UpdateDialog extends JDialog implements ActionListener {
 	}
 
 	public void downloadRatioOutput(File file, int ratio, int totalDown, int getFileSize) {
-		String content = taskOutput.getText();
-        String tips = file.getAbsolutePath();
-		int tmpNum = 0;
-		int newNum = 0;
-		String lastStr = null;
-		if (getFileSize == -1) {
-			lastStr = "KB";
-			tmpNum = lastStr.length();
-			newNum = totalDown/1024;
-            tips = "The downloading size of " + tips + " is:";
-		} else {
-			lastStr = "%";
-			tmpNum = lastStr.length();
-			newNum = ratio;
-            tips = "The downloading ratio of " + tips + " is:";
-		}
+        String content = taskOutput.getText();
+        String tips = "文件" + file.getAbsolutePath();
+        int tmpNum = 0;
+        int newNum = 0;
+        String lastStr = null;
+        if (getFileSize == -1) {
+            lastStr = "KB";
+            tmpNum = lastStr.length();
+            newNum = totalDown / 1024;
+            tips = tips + "下载的大小为:";
+        } else {
+            lastStr = "%";
+            tmpNum = lastStr.length();
+            newNum = ratio;
+            tips = tips + "下载的百分比为:";
+        }
 		int beginIndex = content.indexOf(tips);
 		if (beginIndex == -1) {
 			taskOutput.insert(tips + newNum + lastStr, content.length());
 		} else {
 			beginIndex = beginIndex + tips.length();
 			String oldNum = content.substring(beginIndex, content.length() - tmpNum);
+            System.out.println(content);
+            System.out.println(tips);
+            System.out.println(tmpNum);
 
 			if (Integer.valueOf(oldNum) == newNum) {
                 return;

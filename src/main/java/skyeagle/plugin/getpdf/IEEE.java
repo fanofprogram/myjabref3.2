@@ -36,7 +36,7 @@ public class IEEE implements GetPdfFile {
 			doc = Jsoup.connect(url).cookies(cookies).timeout(30000).get();
 			link= doc.select("a#full-text-pdf").attr("href");
 			if (link.isEmpty()) {
-                dig.output("cann't find the link to download pdf file, please try to use proxy or change the proxy");
+                dig.output("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
 				return;
 			}
 			link="http://ieeexplore.ieee.org"+link;
@@ -50,16 +50,20 @@ public class IEEE implements GetPdfFile {
 				}
 			}
 		} catch (IOException e) {
+            dig.output("网络不通，请检查代理和网络。");
 			e.printStackTrace();
-            dig.output("The network don't work, please check proxy and network.");
 			return;
 		}
 
 		HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies,false);
 		con.setRequestProperty("Referer", link);
 		int filesize = con.getContentLength();
-		GetPDFUtil.getPDFFile(file, filesize, dig, con);
-		con.disconnect();
+        if (filesize != -1) {
+            GetPDFUtil.getFileByMultiThread(file, filesize, dig, url, usingProxy);
+        } else {
+            GetPDFUtil.getPDFFile(file, filesize, dig, con);
+            con.disconnect();
+        }
 	}
 
 	public static void main(String[] args) throws IOException {

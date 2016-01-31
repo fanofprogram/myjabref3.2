@@ -24,21 +24,25 @@ public class AIP implements GetPdfFile {
         Map<String, String> cookies = new TreeMap<>();
         String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
         if (pagecontent == null) {
-            dig.output("The network don't work, please check proxy and network.");
+            dig.output("网络不通，请检查代理和网络。");
             return;
         }
         Document doc = Jsoup.parse(pagecontent);
         String pdflink = doc.select("a[class=pdf]").attr("href");
         if (pdflink.isEmpty()) {
-            dig.output("cann't find the link to download pdf file, please try to use proxy or change the proxy");
+            dig.output("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
             return;
         }
         pdflink = "http://scitation.aip.org" + pdflink;
 
         HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies, false);
         int filesize = con.getContentLength();
-        GetPDFUtil.getPDFFile(file, filesize, dig, con);
-        con.disconnect();
+        if (filesize != -1) {
+            GetPDFUtil.getFileByMultiThread(file, filesize, dig, url, usingProxy);
+        } else {
+            GetPDFUtil.getPDFFile(file, filesize, dig, con);
+            con.disconnect();
+        }
     }
 
     public static void main(String[] args) throws IOException {

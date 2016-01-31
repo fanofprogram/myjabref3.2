@@ -34,7 +34,7 @@ public class UpdateFieldCommand {
         panel = frame.getCurrentBasePanel();
 		bes = panel.mainTable.getSelectedEntries();
 
-        dialog = new UpdateDialog(frame, "Update the item");
+        dialog = new UpdateDialog(frame, "更新记录条目");
 
 		UpdateField updateField = new UpdateField(this);
 		Thread update = new Thread(updateField);
@@ -75,7 +75,7 @@ class UpdateField implements Runnable {
 				url=CommandUtil.DOItoURL(url);
 				String item = ImapMail.getItem(url, dig);
 				if (item == null) {
-                    dig.output("Program can't get item from " + url);
+                    dig.output("网址" + url + "文献引用获取失败");
 				} else {
                     BibEntry oldEntry = bes[i];
                     BibEntry newEntry = BibtexParser.singleFromString(item);
@@ -83,12 +83,12 @@ class UpdateField implements Runnable {
 				}
 			} else {
 				int id = panel.mainTable.findEntry(bes[i]) + 1;
-                dig.output("The " + id + "item don't have the url.");
+                dig.output("第" + id + "条记录没有网址，无法更新");
 				continue;
 			}
 
 		}
-        dig.btnCancel.setText("Close the dialog");
+        dig.btnCancel.setText("关闭对话框");
 	}
 
     private void checkAndUpdate(BibEntry oldEntry, BibEntry newEntry) {
@@ -100,7 +100,7 @@ class UpdateField implements Runnable {
 				int id = panel.mainTable.findEntry(oldEntry) + 1;
 				String oldField = oldEntry.getField(fields[i]);
 				String newField = newEntry.getField(fields[i]);
-                dig.output("The " + fields[i] + " of " + id + " item was changed from " + oldField + " to " + newField);
+                dig.output("将第" + id + "条记录的" + fields[i] + "从" + oldField + "变为" + newField);
 				oldEntry.setField(fields[i], newField);
 			}
 		}
@@ -127,7 +127,7 @@ class UpdateField implements Runnable {
 					if ((file != null) && file.exists()) {
 						File dir = file.getParentFile();
 						File newFile = new File(dir, newLink);
-                        dig.output("The name of " + file.getAbsolutePath() + " was changed.");
+                        dig.output("对文件" + file.getAbsolutePath() + "进行了改名。");
 						file.renameTo(newFile);
 						getNewLink(fle, newFile,metaData);
 						entry.setField("file", tm.getStringRepresentation());
@@ -136,7 +136,7 @@ class UpdateField implements Runnable {
 			}
 		} else {
 			int id = panel.mainTable.findEntry(entry) + 1;
-            dig.output("The " + id + " item don't have file link,  don't need change the file name.");
+            dig.output("第" + id + "条记录没有连接文件！不需要进行文件改名。");
 		}
 	}
 

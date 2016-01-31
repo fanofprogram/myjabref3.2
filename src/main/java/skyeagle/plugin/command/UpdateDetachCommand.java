@@ -43,10 +43,10 @@ public class UpdateDetachCommand {
 	private void DeleteUpdate(ArrayList<File> alFile) {
 		for (File file : alFile) {
 			if (file == null) {
-                frame.showMessage("File don't exist!");
+                frame.showMessage("文件不存在！");
 			} else {
 				if (!file.delete()) {
-                    frame.showMessage(file.getAbsolutePath() + " can't be deleted.");
+                    frame.showMessage(file.getAbsolutePath() + "无法删除。");
 				}
 			}
 		}
@@ -74,7 +74,7 @@ public class UpdateDetachCommand {
 		@Override
 		public void run() {
             if (md != null) {
-                dig.output("The follow files will be deleted:");
+                dig.output("将要删除以下文件：");
                 for (int i = 0; i < be.length; i++) {
 					FileListTableModel tm = new FileListTableModel();
                     tm.setContent(be[i].getField("file"));
@@ -89,7 +89,7 @@ public class UpdateDetachCommand {
 						}
 					} else {
                         int id = bp.mainTable.findEntry(be[i]) + 1;
-                        dig.output("PDF file linking to the " + id + " item don't find.");
+                        dig.output("第" + id + "条记录没有连接文件！");
 					}
 				}
 			}

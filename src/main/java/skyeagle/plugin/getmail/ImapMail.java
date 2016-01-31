@@ -93,7 +93,7 @@ public class ImapMail {
             userName = prop.getProperty("username");
             String newPwd = prop.getProperty("password");
             userPassword = Endecrypt.convertMD5(newPwd);
-            searchKeyword = prop.getProperty("searchkeyword");
+            searchKeyword = "学术搜索快讯 - [ " + prop.getProperty("searchkeyword") + " ]";
 
             String dateString = prop.getProperty("startday");
             SimpleDateFormat sDateFormat = new SimpleDateFormat(dateFormat);
@@ -102,7 +102,7 @@ public class ImapMail {
             dateString = prop.getProperty("endday");
             sDateFormat = new SimpleDateFormat(dateFormat);
             enddate = sDateFormat.parse(dateString, new ParsePosition(0));
-            diag.output("Start to connect Gmail .....");
+            diag.output("开始连接Gmail信箱.....");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -124,8 +124,8 @@ public class ImapMail {
 
             Store store = session.getStore(urln);
             store.connect();
-            diag.output("already connected Gmail.");
-            diag.output("Start to get mail in Incoming Box.....");
+            diag.output("已经连上信箱.");
+            diag.output("开始读取收件箱中的邮件.....");
             Folder folder = store.getFolder("INBOX");
             folder.open(Folder.READ_ONLY);
             SearchTerm stDate = new AndTerm(new ReceivedDateTerm(ComparisonTerm.GE, startdate),
@@ -133,9 +133,9 @@ public class ImapMail {
             SearchTerm st = new AndTerm(new FromStringTerm("scholaralerts-noreply@google.com"), stDate);
             Message[] messages = folder.search(st);
 
-            diag.output("There are " + messages.length + " " + searchKeyword + " mails in Incoming Box.");
+            diag.output("收件箱中共有" + messages.length + "封" + searchKeyword + "邮件。");
             if (messages.length != 0) {
-                diag.output("Start to analysize all these mails.....");
+                diag.output("========开始解析这些邮件=========");
                 for (Message message : messages) {
                     IMAPMessage msg = (IMAPMessage) message;
                     String subject = MimeUtility.decodeText(msg.getSubject());
@@ -143,7 +143,7 @@ public class ImapMail {
                         Date sentDate = msg.getSentDate();
                         SimpleDateFormat format = new SimpleDateFormat(dateFormat);
                         String strSentDate = format.format(sentDate);
-                        diag.output("Start to analysize the mail in " + strSentDate);
+                        diag.output("分析发送日期为" + strSentDate + "的邮件...");
                         readedDay.add(strSentDate);
                         String strTmp = null;
                         if (msg.isMimeType("text/html")) {
@@ -193,7 +193,7 @@ public class ImapMail {
             folder.close(false);
             store.close();
         } catch (Exception e) {
-            frame.showMessage("can't connect Gmail, please check username , password and network.");
+            frame.showMessage("不能连接上Gmail信箱，请检查用户名，密码和网络。");
             diag.close();
         }
         return urls;
@@ -295,9 +295,9 @@ public class ImapMail {
                 GetCite getCite = (GetCite) con.newInstance(itemUrl);
                 itemString = getCite.getCiteItem();
                 if (itemString != null) {
-                    diag.output("Getting  the reference in " + itemUrl + " is done.");
+                    diag.output("完成对" + itemUrl + "中文献引用的获取。");
                 } else {
-                    diag.output("cann't connect the " + itemUrl + ", please check the network.");
+                    diag.output("无法连接" + itemUrl + "。 请检查网络。");
                     return null;
                 }
             } catch (Exception e) {
@@ -305,7 +305,7 @@ public class ImapMail {
             }
 
         } else {
-            diag.output("cann't find the rule which correspond to" + itemUrl);
+            diag.output("找不到" + itemUrl + "的匹配器。");
         }
         return itemString;
     }

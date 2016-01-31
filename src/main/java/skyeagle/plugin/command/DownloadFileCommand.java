@@ -35,17 +35,16 @@ public class DownloadFileCommand {
 
     public DownloadFileCommand(JabRefFrame f) {
         frame = f;
-        int select = JOptionPane.showConfirmDialog(frame, "Use proxy to download PDF file?", "Confim",
-                JOptionPane.YES_NO_OPTION);
+        int select = JOptionPane.showConfirmDialog(frame, "是否使用代理下载文献？", "提示：", JOptionPane.YES_NO_OPTION);
         if (select == JOptionPane.OK_OPTION) {
             if (!file.exists()) {
-                frame.showMessage("Please setup the proxy.");
+                frame.showMessage("请设置代理。");
                 return;
             }
             usingProxy = true;
         }
 
-        dialog = new UpdateDialog(frame, "Download the pdf file");
+        dialog = new UpdateDialog(frame, "下载pdf文件");
         DownloadFile download = new DownloadFile(this);
         Thread downThread = new Thread(download);
         downThread.start();
@@ -77,7 +76,7 @@ class DownloadFile implements Runnable {
 
     @Override
     public void run() {
-        dig.output("Start to download file:");
+        dig.output("开始进行文献下载：");
 
         for (BibEntry be : bes) {
             String url = be.getField("url");
@@ -85,7 +84,7 @@ class DownloadFile implements Runnable {
                 url = CommandUtil.DOItoURL(url);
                 String name = be.getField(BibEntry.KEY_FIELD) + ".pdf";
                 File file = expandFilename(metaData, name);
-                dig.output("Now downloading the file " + file.getAbsolutePath() + ":");
+                dig.output("进行文献" + file.getAbsolutePath() + "的下载：");
                 if ((file != null) && !file.exists()) {
                     Downloading(url, dig, file);
                     if (file.exists()) {
@@ -97,10 +96,10 @@ class DownloadFile implements Runnable {
                         tm.addEntry(0, fle);
                         be.setField("file", tm.getStringRepresentation());
                     } else {
-                        dig.output("Fail to download the file " + file.toString());
+                        dig.output(file.toString() + "下载失败。");
                     }
                 } else {
-                    dig.output(file.toString() + " exist");
+                    dig.output(file.toString() + "文件存在。");
                 }
             } else {
                 int id = panel.mainTable.findEntry(be) + 1;
@@ -108,7 +107,7 @@ class DownloadFile implements Runnable {
                 continue;
             }
         }
-        dig.btnCancel.setText("Downloading is finished, close this dialog.");
+        dig.btnCancel.setText("下载完成，关闭对话框");
     }
 
     private File expandFilename(MetaData md, String name) {
@@ -180,7 +179,7 @@ class DownloadFile implements Runnable {
             }
 
         } else {
-            d.output("Program can't find the rule for " + url + " to download");
+            dig.output("找不到" + url + "的匹配器。");
         }
     }
 

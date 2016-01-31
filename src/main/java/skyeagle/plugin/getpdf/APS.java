@@ -26,7 +26,7 @@ public class APS implements GetPdfFile {
     @Override
     public void getFile(UpdateDialog dig, File file, Boolean usingProxy) {
 
-        dig.output("APS need to click the image of Einstan head, now this problem can't solve.");
+        dig.output("APS要进行爱因斯坦头像认证，现在还解决不了，请手工下载");
 		return;
         //		// ��ȡ��ַ�����ݣ�html)��cookies
 //		Map<String, String> cookies = new TreeMap<>();

@@ -43,13 +43,13 @@ class GetMails implements Runnable {
         ArrayList<String> sbNotRec = new ArrayList<>();
 
 		urls = gmail.getEmailContent();
-        dialog.output("Start to get item infomation in the url .....");
+        dialog.output("开始获取网址中的文献信息.....");
 
 		int numUrl = 0;
 		while ((urls != null) && !dialog.stop && (numUrl < urls.size())) {
 			String item = ImapMail.getItem(urls.get(numUrl),dialog);
 			if (item == null) {
-                dialog.output("fail to get item in" + urls.get(numUrl));
+                dialog.output("网址" + urls.get(numUrl) + "文献引用获取失败");
 				sbNotRec.add(urls.get(numUrl));
 			} else {
 				sbEntries.append(item);
@@ -57,13 +57,11 @@ class GetMails implements Runnable {
 			numUrl++;
 		}
 
-        // �ܽ���Ϣ
-        dialog.output("There are " + urls.size() + " items, however the follow " + sbNotRec.size()
-                + " items can't get information");
+        dialog.output("共有文献" + urls.size() + "篇，下面的" + sbNotRec.size() + "篇没有能够获取到文献信息：");
 		for (int i = 0; i < sbNotRec.size(); i++) {
 			dialog.output(sbNotRec.get(i));
 		}
-        dialog.output("all items was collected. ");
-        dialog.btnCancel.setText("Close Dialog");
+        dialog.output("完成所有文献引用的收集。");
+        dialog.btnCancel.setText("关闭对话框");
 	}
 }

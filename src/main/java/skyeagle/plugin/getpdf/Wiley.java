@@ -32,7 +32,7 @@ public class Wiley implements GetPdfFile {
 			doc = Jsoup.connect(url).timeout(30000).get();
 			link = doc.select("a#journalToolsPdfLink[title=Article in pdf format]").attr("href");
 		} catch (IOException e1) {
-            dig.output("The network don't work, please check proxy and network.");
+            dig.output("网络不通，请检查代理和网络。");
 			e1.printStackTrace();
 			return;
 		}
@@ -48,7 +48,7 @@ public class Wiley implements GetPdfFile {
 		Document doc = Jsoup.parse(pdfpage);
 		String pdflink = doc.select("iframe#pdfDocument").attr("src");
 		if (pdflink.isEmpty()) {
-            dig.output("cann't find the link to download pdf file, please try to use proxy or change the proxy");
+            dig.output("页面上找不到下载pdf文件的连接，请尝试使用代理或更换代理。");
 			return;
 		}
 
@@ -61,9 +61,12 @@ public class Wiley implements GetPdfFile {
 
 		HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies,usingProxy);
 		int filesize = con.getContentLength();
-		GetPDFUtil.getPDFFile(file, filesize, dig, con);
-		con.disconnect();
-
+        if (filesize != -1) {
+            GetPDFUtil.getFileByMultiThread(file, filesize, dig, url, usingProxy);
+        } else {
+            GetPDFUtil.getPDFFile(file, filesize, dig, con);
+            con.disconnect();
+        }
 	}
 
 	public static void main(String[] args) {

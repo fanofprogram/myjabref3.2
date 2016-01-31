@@ -3,7 +3,7 @@ package skyeagle.plugin.gui;
 /*
  * DateChooser.java
  *
- * Created on 2007Äê8ÔÂ22ÈÕ, ÏÂÎç6:07
+ * Created on 2007ï¿½ï¿½8ï¿½ï¿½22ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½6:07
  *
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
@@ -55,21 +55,21 @@ import javax.swing.event.AncestorListener;
  */
 public class DateChooser extends JPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private Date initDate;
-	private Calendar now = Calendar.getInstance();
-	private Calendar select;
-	private JPanel monthPanel;// ÔÂÀú
-	private JP1 jp1;// ËÄ¿éÃæ°å,×é³É
+	private final Date initDate;
+	private final Calendar now = Calendar.getInstance();
+	private final Calendar select;
+    private JPanel monthPanel;// ï¿½ï¿½ï¿½ï¿½
+    private JP1 jp1;// ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½
 	private JP2 jp2;
 	private JP3 jp3;
 	private JP4 jp4;
-	private Font font = new Font("ËÎÌå", Font.PLAIN, 12);
+    private final Font font = new Font("ï¿½ï¿½ï¿½ï¿½", Font.PLAIN, 12);
 	private final LabelManager lm = new LabelManager();
 	private JLabel showDate;// ,toSelect;
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyyÄêMMÔÂddÈÕ");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyå¹´MMæœˆddæ—¥");
 	private boolean isShow = false;
 	private Popup pop;
 
@@ -88,19 +88,20 @@ public class DateChooser extends JPanel {
 		initLabel();
 	}
 
-	public void setEnabled(boolean b) {
+	@Override
+    public void setEnabled(boolean b) {
 		super.setEnabled(b);
 		showDate.setEnabled(b);
 	}
 
 	/**
-	 * µÃµ½µ±Ç°Ñ¡Ôñ¿òµÄÈÕÆÚ
-	 */
+     * ï¿½Ãµï¿½ï¿½ï¿½Ç°Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+     */
 	public Date getDate() {
 		return select.getTime();
 	}
 
-	// ¸ù¾Ý³õÊ¼»¯µÄÈÕÆÚ,³õÊ¼»¯Ãæ°å
+    // ï¿½ï¿½ï¿½Ý³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	private void initPanel() {
 		monthPanel = new JPanel(new BorderLayout());
 		monthPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
@@ -111,28 +112,32 @@ public class DateChooser extends JPanel {
 		monthPanel.add(up, BorderLayout.NORTH);
 		monthPanel.add(jp4 = new JP4(), BorderLayout.SOUTH);
 		this.addAncestorListener(new AncestorListener() {
-			public void ancestorAdded(AncestorEvent event) {
+			@Override
+            public void ancestorAdded(AncestorEvent event) {
 
 			}
 
-			public void ancestorRemoved(AncestorEvent event) {
+			@Override
+            public void ancestorRemoved(AncestorEvent event) {
 
 			}
 
-			// Ö»Òª×æÏÈ×é¼þÒ»ÒÆ¶¯,ÂíÉÏ¾ÍÈÃpopupÏûÊ§
-			public void ancestorMoved(AncestorEvent event) {
+            // Ö»Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Æ¶ï¿½,ï¿½ï¿½ï¿½Ï¾ï¿½ï¿½ï¿½popupï¿½ï¿½Ê§
+			@Override
+            public void ancestorMoved(AncestorEvent event) {
 				hidePanel();
 			}
 
 		});
 	}
 
-	// ³õÊ¼»¯±êÇ©
+    // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ç©
 	private void initLabel() {
 		showDate = new JLabel(sdf.format(initDate));
 		showDate.setRequestFocusEnabled(true);
 		showDate.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent me) {
+			@Override
+            public void mousePressed(MouseEvent me) {
 				showDate.requestFocusInWindow();
 			}
 		});
@@ -145,21 +150,24 @@ public class DateChooser extends JPanel {
 		this.setPreferredSize(new Dimension(90, 25));
 		this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		showDate.addMouseListener(new MouseAdapter() {
-			public void mouseEntered(MouseEvent me) {
+			@Override
+            public void mouseEntered(MouseEvent me) {
 				if (showDate.isEnabled()) {
 					showDate.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					showDate.setForeground(Color.RED);
 				}
 			}
 
-			public void mouseExited(MouseEvent me) {
+			@Override
+            public void mouseExited(MouseEvent me) {
 				if (showDate.isEnabled()) {
 					showDate.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					showDate.setForeground(Color.BLACK);
 				}
 			}
 
-			public void mousePressed(MouseEvent me) {
+			@Override
+            public void mousePressed(MouseEvent me) {
 				if (showDate.isEnabled()) {
 					showDate.setForeground(Color.CYAN);
 					if (isShow) {
@@ -170,33 +178,36 @@ public class DateChooser extends JPanel {
 				}
 			}
 
-			public void mouseReleased(MouseEvent me) {
+			@Override
+            public void mouseReleased(MouseEvent me) {
 				if (showDate.isEnabled()) {
 					showDate.setForeground(Color.BLACK);
 				}
 			}
 		});
 		showDate.addFocusListener(new FocusListener() {
-			public void focusLost(FocusEvent e) {
+			@Override
+            public void focusLost(FocusEvent e) {
 				hidePanel();
 			}
 
-			public void focusGained(FocusEvent e) {
+			@Override
+            public void focusGained(FocusEvent e) {
 
 			}
 		});
 	}
 
-	// ¸ù¾ÝÐÂµÄÈÕÆÚË¢ÐÂ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½
 	private void refresh() {
 		jp1.updateDate();
 		jp3.updateDate();
 		SwingUtilities.updateComponentTreeUI(this);
 	}
 
-	// Ìá½»ÈÕÆÚ
+    // ï¿½á½»ï¿½ï¿½ï¿½ï¿½
 	private void commit() {
-		// System.out.println("Ñ¡ÖÐµÄÈÕÆÚÊÇ£º"+sdf.format(select.getTime()));
+        // System.out.println("Ñ¡ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½"+sdf.format(select.getTime()));
 		showDate.setText(sdf.format(select.getTime()));
 		hidePanel();
 	}
@@ -221,10 +232,10 @@ public class DateChooser extends JPanel {
 		if (x < 0) {
 			x = 0;
 		}
-		if (x > size.width - 295) {
+		if (x > (size.width - 295)) {
 			x = size.width - 295;
 		}
-		if (y < size.height - 170) {
+		if (y < (size.height - 170)) {
 		} else {
 			y -= 188;
 		}
@@ -235,7 +246,7 @@ public class DateChooser extends JPanel {
 
 	private class JP1 extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		JLabel left, right, center;
@@ -248,9 +259,9 @@ public class DateChooser extends JPanel {
 
 		private void initJP1() {
 			left = new JLabel(" << ", JLabel.CENTER);
-			left.setToolTipText("ÉÏÒ»ÔÂ");
+            left.setToolTipText("ä¸Šä¸€æœˆ");
 			right = new JLabel(" >> ", JLabel.CENTER);
-			right.setToolTipText("ÏÂÒ»ÔÂ");
+            right.setToolTipText("ä¸‹ä¸€æœˆ");
 			left.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 			right.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 			center = new JLabel("", JLabel.CENTER);
@@ -260,57 +271,65 @@ public class DateChooser extends JPanel {
 			this.add(right, BorderLayout.EAST);
 			this.setPreferredSize(new Dimension(295, 25));
 			left.addMouseListener(new MouseAdapter() {
-				public void mouseEntered(MouseEvent me) {
+				@Override
+                public void mouseEntered(MouseEvent me) {
 					left.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					left.setForeground(Color.RED);
 				}
 
-				public void mouseExited(MouseEvent me) {
+				@Override
+                public void mouseExited(MouseEvent me) {
 					left.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					left.setForeground(Color.BLACK);
 				}
 
-				public void mousePressed(MouseEvent me) {
+				@Override
+                public void mousePressed(MouseEvent me) {
 					select.add(Calendar.MONTH, -1);
 					left.setForeground(Color.WHITE);
 					refresh();
 				}
 
-				public void mouseReleased(MouseEvent me) {
+				@Override
+                public void mouseReleased(MouseEvent me) {
 					left.setForeground(Color.BLACK);
 				}
 			});
 			right.addMouseListener(new MouseAdapter() {
-				public void mouseEntered(MouseEvent me) {
+				@Override
+                public void mouseEntered(MouseEvent me) {
 					right.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					right.setForeground(Color.RED);
 				}
 
-				public void mouseExited(MouseEvent me) {
+				@Override
+                public void mouseExited(MouseEvent me) {
 					right.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					right.setForeground(Color.BLACK);
 				}
 
-				public void mousePressed(MouseEvent me) {
+				@Override
+                public void mousePressed(MouseEvent me) {
 					select.add(Calendar.MONTH, 1);
 					right.setForeground(Color.WHITE);
 					refresh();
 				}
 
-				public void mouseReleased(MouseEvent me) {
+				@Override
+                public void mouseReleased(MouseEvent me) {
 					right.setForeground(Color.BLACK);
 				}
 			});
 		}
 
 		private void updateDate() {
-			center.setText(select.get(Calendar.YEAR) + "Äê" + (select.get(Calendar.MONTH) + 1) + "ÔÂ");
+            center.setText(select.get(Calendar.YEAR) + "å¹´" + (select.get(Calendar.MONTH) + 1) + "æœˆ");
 		}
 	}
 
 	private class JP2 extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -318,16 +337,17 @@ public class DateChooser extends JPanel {
 			this.setPreferredSize(new Dimension(295, 20));
 		}
 
-		protected void paintComponent(Graphics g) {
+		@Override
+        protected void paintComponent(Graphics g) {
 			g.setFont(font);
-			g.drawString("ÐÇÆÚÈÕ ÐÇÆÚÒ» ÐÇÆÚ¶þ ÐÇÆÚÈý ÐÇÆÚËÄ ÐÇÆÚÎå ÐÇÆÚÁù", 5, 10);
+            g.drawString("æ˜ŸæœŸæ—¥ æ˜ŸæœŸä¸€ æ˜ŸæœŸäºŒ æ˜ŸæœŸä¸‰ æ˜ŸæœŸå›› æ˜ŸæœŸäº” æ˜ŸæœŸå…­", 5, 10);
 			g.drawLine(0, 15, getWidth(), 15);
 		}
 	}
 
 	private class JP3 extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -365,10 +385,10 @@ public class DateChooser extends JPanel {
 
 	private class MyLabel extends JLabel implements Comparator<MyLabel>, MouseListener, MouseMotionListener {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
-		private int year, month, day;
+		private final int year, month, day;
 		private boolean isSelected;
 
 		public MyLabel(int year, int month, int day) {
@@ -409,10 +429,11 @@ public class DateChooser extends JPanel {
 			this.repaint();
 		}
 
-		protected void paintComponent(Graphics g) {
+		@Override
+        protected void paintComponent(Graphics g) {
 			// ****************************************
-			// wangchaoÌí¼ÓÏÂÃæµÄ´úÂë£¬·ÇÔ­Ê¼´úÂë
-			// ×÷ÓÃÊÇ¸øÎÄ¼þÖÐµÄÈÕÆÚ¼ÓÂÌ¿ò
+            // wangchaoï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ë£¬ï¿½ï¿½Ô­Ê¼ï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½Ä¼ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½Ì¿ï¿½
 			File pluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 			File dayfile = new File(pluginDir, "day.prop");
 			String dateFormat = "yyyy-MM-dd";
@@ -430,8 +451,8 @@ public class DateChooser extends JPanel {
 							Date tmpdate = sDateFormat.parse(myday, new ParsePosition(0));
 							Calendar tmpCal = Calendar.getInstance();
 							tmpCal.setTime(tmpdate);
-							if (day == tmpCal.get(Calendar.DAY_OF_MONTH) && month == tmpCal.get(Calendar.MONTH)
-									&& year == tmpCal.get(Calendar.YEAR)) {
+							if ((day == tmpCal.get(Calendar.DAY_OF_MONTH)) && (month == tmpCal.get(Calendar.MONTH))
+									&& (year == tmpCal.get(Calendar.YEAR))) {
 								Graphics2D gd = (Graphics2D) g;
 								gd.setColor(Color.GREEN);
 								Polygon p = new Polygon();
@@ -450,14 +471,14 @@ public class DateChooser extends JPanel {
 			}
 			// ****************************************
 
-			if (day == select.get(Calendar.DAY_OF_MONTH) && month == select.get(Calendar.MONTH)) {
-				// Èç¹ûµ±Ç°ÈÕÆÚÊÇÑ¡ÔñÈÕÆÚ,Ôò¸ßÁÁÏÔÊ¾
+			if ((day == select.get(Calendar.DAY_OF_MONTH)) && (month == select.get(Calendar.MONTH))) {
+                // ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 				g.setColor(new Color(160, 185, 215));
 				g.fillRect(0, 0, getWidth(), getHeight());
 			}
-			if (year == now.get(Calendar.YEAR) && month == now.get(Calendar.MONTH)
-					&& day == now.get(Calendar.DAY_OF_MONTH)) {
-				// Èç¹ûÈÕÆÚºÍµ±Ç°ÈÕÆÚÒ»Ñù,ÔòÓÃºì¿ò
+			if ((year == now.get(Calendar.YEAR)) && (month == now.get(Calendar.MONTH))
+					&& (day == now.get(Calendar.DAY_OF_MONTH))) {
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÚºÍµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½,ï¿½ï¿½ï¿½Ãºï¿½ï¿½
 				Graphics2D gd = (Graphics2D) g;
 				gd.setColor(Color.RED);
 				Polygon p = new Polygon();
@@ -467,7 +488,7 @@ public class DateChooser extends JPanel {
 				p.addPoint(0, getHeight() - 1);
 				gd.drawPolygon(p);
 			}
-			if (isSelected) {// Èç¹û±»Ñ¡ÖÐÁË¾Í»­³öÒ»¸öÐéÏß¿ò³öÀ´
+            if (isSelected) {// ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ë¾Í»ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½ï¿½
 				Stroke s = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1.0f,
 						new float[] { 2.0f, 2.0f }, 1.0f);
 				Graphics2D gd = (Graphics2D) g;
@@ -483,7 +504,8 @@ public class DateChooser extends JPanel {
 			super.paintComponent(g);
 		}
 
-		public boolean contains(Point p) {
+		@Override
+        public boolean contains(Point p) {
 			return this.getBounds().contains(p);
 		}
 
@@ -491,35 +513,43 @@ public class DateChooser extends JPanel {
 			repaint();
 		}
 
-		public void mouseClicked(MouseEvent e) {
+		@Override
+        public void mouseClicked(MouseEvent e) {
 		}
 
-		public void mousePressed(MouseEvent e) {
+		@Override
+        public void mousePressed(MouseEvent e) {
 			isSelected = true;
 			update();
 		}
 
-		public void mouseReleased(MouseEvent e) {
+		@Override
+        public void mouseReleased(MouseEvent e) {
 			Point p = SwingUtilities.convertPoint(this, e.getPoint(), jp3);
 			lm.setSelect(p, false);
 			commit();
 		}
 
-		public void mouseEntered(MouseEvent e) {
+		@Override
+        public void mouseEntered(MouseEvent e) {
 		}
 
-		public void mouseExited(MouseEvent e) {
+		@Override
+        public void mouseExited(MouseEvent e) {
 		}
 
-		public void mouseDragged(MouseEvent e) {
+		@Override
+        public void mouseDragged(MouseEvent e) {
 			Point p = SwingUtilities.convertPoint(this, e.getPoint(), jp3);
 			lm.setSelect(p, true);
 		}
 
-		public void mouseMoved(MouseEvent e) {
+		@Override
+        public void mouseMoved(MouseEvent e) {
 		}
 
-		public int compare(MyLabel o1, MyLabel o2) {
+		@Override
+        public int compare(MyLabel o1, MyLabel o2) {
 			Calendar c1 = Calendar.getInstance();
 			c1.set(o1.year, o2.month, o1.day);
 			Calendar c2 = Calendar.getInstance();
@@ -529,7 +559,7 @@ public class DateChooser extends JPanel {
 	}
 
 	private class LabelManager {
-		private List<MyLabel> list;
+		private final List<MyLabel> list;
 
 		public LabelManager() {
 			list = new ArrayList<MyLabel>();
@@ -558,10 +588,10 @@ public class DateChooser extends JPanel {
 		}
 
 		public void setSelect(Point p, boolean b) {
-			// Èç¹ûÊÇÍÏ¶¯,ÔòÒªÓÅ»¯Ò»ÏÂ,ÒÔÌá¸ßÐ§ÂÊ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½,ï¿½ï¿½Òªï¿½Å»ï¿½Ò»ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
 			if (b) {
-				// ±íÊ¾ÊÇ·ñÄÜ·µ»Ø,²»ÓÃ±È½ÏÍêËùÓÐµÄ±êÇ©,ÄÜ·µ»ØµÄ±êÖ¾¾ÍÊÇ°ÑÉÏÒ»¸ö±êÇ©ºÍ
-				// ½«ÒªÏÔÊ¾µÄ±êÇ©ÕÒµ½ÁË¾Í¿ÉÒÔÁË
+                // ï¿½ï¿½Ê¾ï¿½Ç·ï¿½ï¿½Ü·ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ã±È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ±ï¿½Ç©,ï¿½Ü·ï¿½ï¿½ØµÄ±ï¿½Ö¾ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ç©ï¿½ï¿½
+                // ï¿½ï¿½Òªï¿½ï¿½Ê¾ï¿½Ä±ï¿½Ç©ï¿½Òµï¿½ï¿½Ë¾Í¿ï¿½ï¿½ï¿½ï¿½ï¿½
 				boolean findPrevious = false, findNext = false;
 				for (MyLabel m : list) {
 					if (m.contains(p)) {
@@ -598,7 +628,7 @@ public class DateChooser extends JPanel {
 
 	private class JP4 extends JPanel {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -606,29 +636,33 @@ public class DateChooser extends JPanel {
 			super(new BorderLayout());
 			this.setPreferredSize(new Dimension(295, 20));
 			this.setBackground(new Color(160, 185, 215));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyÄêMMÔÂddÈÕ");
-			final JLabel jl = new JLabel("½ñÌì: " + sdf.format(new Date()));
-			jl.setToolTipText("µã»÷»Øµ½½ñÌìÈÕÆÚ");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyå¹´MMæœˆddæ—¥");
+            final JLabel jl = new JLabel("ä»Šå¤©: " + sdf.format(new Date()));
+            jl.setToolTipText("ç‚¹å‡»å›žåˆ°ä»Šå¤©æ—¥æœŸ");
 			this.add(jl, BorderLayout.CENTER);
 			jl.addMouseListener(new MouseAdapter() {
-				public void mouseEntered(MouseEvent me) {
+				@Override
+                public void mouseEntered(MouseEvent me) {
 					jl.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					jl.setForeground(Color.RED);
 				}
 
-				public void mouseExited(MouseEvent me) {
+				@Override
+                public void mouseExited(MouseEvent me) {
 					jl.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					jl.setForeground(Color.BLACK);
 				}
 
-				public void mousePressed(MouseEvent me) {
+				@Override
+                public void mousePressed(MouseEvent me) {
 					jl.setForeground(Color.WHITE);
 					select.setTime(new Date());
 					refresh();
 					commit();
 				}
 
-				public void mouseReleased(MouseEvent me) {
+				@Override
+                public void mouseReleased(MouseEvent me) {
 					jl.setForeground(Color.BLACK);
 				}
 			});
@@ -642,7 +676,7 @@ public class DateChooser extends JPanel {
 	// DateChooser mp=new DateChooser(date);
 	// JFrame jf=new JFrame("test");
 	// jf.add(mp,BorderLayout.CENTER);
-	// jf.add(new JButton("²âÊÔÓÃµÄ"),BorderLayout.NORTH);
+    // jf.add(new JButton("ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½"),BorderLayout.NORTH);
 	// jf.pack();
 	// jf.setLocationRelativeTo(null);
 	// jf.setVisible(true);

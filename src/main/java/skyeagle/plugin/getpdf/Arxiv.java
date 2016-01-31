@@ -17,8 +17,12 @@ public class Arxiv implements GetPdfFile {
 		Map<String,String> cookies=GetPDFUtil.getCookies(url);
 		HttpURLConnection con = GetPDFUtil.createPDFLink(url, cookies,false);
 		int filesize = con.getContentLength();
-		GetPDFUtil.getPDFFile(file, filesize, dig, con);
-		con.disconnect();
+        if (filesize != -1) {
+            GetPDFUtil.getFileByMultiThread(file, filesize, dig, url, false);
+        } else {
+            GetPDFUtil.getPDFFile(file, filesize, dig, con);
+            con.disconnect();
+        }
 	}
 	public static void main(String[] args) throws IOException {
 		String str = "http://arxiv.org/pdf/1504.06082";

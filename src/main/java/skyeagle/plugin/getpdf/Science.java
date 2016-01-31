@@ -27,7 +27,7 @@ public class Science implements GetPdfFile {
 		Map<String, String> cookies = new TreeMap<>();
 		String pagecontent = GetPDFUtil.initGetPDF(url, usingProxy, cookies);
 		if (pagecontent == null) {
-            dig.output("The network don't work, please check proxy and network.");
+            dig.output("网络不通，请检查代理和网络。");
 			return;
 		}
 		String pdflink = null;
@@ -44,8 +44,12 @@ public class Science implements GetPdfFile {
 
 		HttpURLConnection con = GetPDFUtil.createPDFLink(pdflink, cookies, usingProxy);
 		int filesize = con.getContentLength();
-		GetPDFUtil.getPDFFile(file, filesize, dig, con);
-		con.disconnect();
+        if (filesize != -1) {
+            GetPDFUtil.getFileByMultiThread(file, filesize, dig, url, usingProxy);
+        } else {
+            GetPDFUtil.getPDFFile(file, filesize, dig, con);
+            con.disconnect();
+        }
 	}
 
 	public static void main(String[] args) throws IOException {
